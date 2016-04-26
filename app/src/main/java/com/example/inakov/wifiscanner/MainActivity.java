@@ -156,7 +156,7 @@ public class MainActivity extends Activity {
             Log.i("WifiReceiver", "Number of ScanResults: " + wifiList.size());
             for(int i = 0; i < wifiList.size(); i++){
                 Log.i("WifiReceiver", "Result SSID - " + wifiList.get(i).SSID);
-                connections.add(wifiList.get(i).SSID + " - " + wifiList.get(i).level);
+                connections.add(wifiList.get(i).SSID + " " + wifiList.get(i).level);
             }
 
             final StableArrayAdapter adapter = new StableArrayAdapter(c,
