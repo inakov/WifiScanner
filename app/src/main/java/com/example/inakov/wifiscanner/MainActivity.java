@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
+import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -39,12 +40,18 @@ public class MainActivity extends Activity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.i("MainActivity", "onCreate called.");
+        Log.d("MainActivity", "onCreate called.");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        WifiConfiguration conf = new WifiConfiguration();
+        conf.SSID = "CatchMeIfYouCan";
+        conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+
         mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-        Log.i("MainActivity", "mainWifi manger acquired." + mainWifi.toString());
+        int netId = mainWifi.addNetwork(conf);
+        mainWifi.enableNetwork(netId, true);
+        Log.d("MainActivity", "mainWifi manger acquired." + mainWifi.toString());
 
         receiverWifi = new WifiReceiver();
 
@@ -52,7 +59,7 @@ public class MainActivity extends Activity {
                 WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
 
         if(!mainWifi.isWifiEnabled()){
-            Log.i("MainActivity", "Enabling wifi.");
+            Log.d("MainActivity", "Enabling wifi.");
             mainWifi.setWifiEnabled(true);
         }
 
@@ -76,7 +83,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 mainWifi.startScan();
-                Log.i("MainActivity", "Refresh clicked");
+                Log.d("MainActivity", "Refresh clicked");
 
             }
         });
@@ -110,12 +117,12 @@ public class MainActivity extends Activity {
 
 
     public void doInback(){
-        Log.i("MainActivity", "doInback called.");
+        Log.d("MainActivity", "doInback called.");
         handler.postDelayed(new Runnable() {
 
             @Override
             public void run(){
-                Log.i("MainActivity", "run recursive scan.");
+                Log.d("MainActivity", "run recursive scan.");
                 mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 
                 receiverWifi = new WifiReceiver();
@@ -124,7 +131,7 @@ public class MainActivity extends Activity {
                 mainWifi.startScan();
                 doInback();
             }
-        }, 1000);
+        }, 2000);
 
     }
 
@@ -146,16 +153,16 @@ public class MainActivity extends Activity {
     class WifiReceiver extends BroadcastReceiver {
 
         public void onReceive(Context c, Intent intent) {
-            Log.i("WifiReceiver", "onReceive.");
+            Log.d("WifiReceiver", "onReceive.");
             ArrayList<String> connections=new ArrayList<String>();
             ArrayList<Float> Signal_Streelenth= new ArrayList<Float>();
 
             sb = new StringBuilder();
             List<ScanResult> wifiList;
             wifiList = mainWifi.getScanResults();
-            Log.i("WifiReceiver", "Number of ScanResults: " + wifiList.size());
-            for(int i = 0; i < wifiList.size(); i++){
-                Log.i("WifiReceiver", "Result SSID - " + wifiList.get(i).SSID);
+            Log.d("WifiReceiver", "Number of ScanResults: " + wifiList.size());
+            for (int i = 0; i < wifiList.size(); i++){
+                Log.d("WifiReceiver", "Result SSID - " + wifiList.get(i).SSID);
                 connections.add(wifiList.get(i).SSID + " " + wifiList.get(i).level);
             }
 
